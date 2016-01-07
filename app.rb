@@ -1,28 +1,25 @@
-require 'bundler'
-require 'net/http'
+require 'sinatra/base'
 require 'liquid'
 require 'sass'
-Bundler.require
+require 'compass'
+require 'byebug'
+require './lib/sassc_template_engine'
+require './lib/rendering_helpers'
+require './config/app_config'
 
-configure do
-  set :app_file, __FILE__
-  set :run, true
-  set :server, %w[thin mongrel webrick]
-end
+module Thinkific
+  class SassCompilerApp < Sinatra::Application
 
-# CSS running through SCSS
-get '/css/*.css' do
-  content_type 'text/css', :charset => 'utf-8'
-  scss params[:splat].join.to_sym, :style => :compressed
-end
+    helpers RenderingHelpers
+    set_compass_config
 
-# Plain old URL with a Liquid template
-get '/' do
-  liquid :index, :locals => { :name => 'world' }
-end
+    get '/foundation_css/:id' do
+      #TODO - Add code to pull the specific tenant's custom css, rather than load it from
+      #the filesystem
+      scss_content = liquid :style, locals: {"brandColor" => '#DCDCDC'}, views: "views/stylesheets"
+      sassc scss_content, Compass.sass_engine_options.merge(:style => :compressed)
+    end
 
-# ERB, and routes with parameters
-get '/hello/:name' do
-  resp = "Hello, #{params[:name]}!"
-  erb resp
+    run! if app_file == $0
+  end
 end

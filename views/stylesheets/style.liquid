@@ -1,0 +1,16 @@
+@import 'base.scss';
+
+$brandColor: {{ brandColor }};
+
+body {
+	color: $brandColor;
+
+	.example {
+  	p.dark {
+    	@include contrasted($brandColor);
+  	}
+  	p.light {
+    	@include contrasted($brandColor);
+  	}
+	}
+}

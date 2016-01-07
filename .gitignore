@@ -3,3 +3,4 @@ Thumbs.db
 *~
 *.swp
 .sass-cache
+.byebug_history
